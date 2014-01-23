@@ -11,7 +11,7 @@
   </a>
 </div>
 
-<div class="dropdown-menu">
+<div class="dropdown-menu" {{bindAttr style="dropDownPosition"}}>
   {{#unless isSelect}}
     <div class="ember-select-search">
       {{view searchView}}

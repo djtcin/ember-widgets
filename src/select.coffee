@@ -54,6 +54,15 @@ Ember.Widgets.SelectOptionView = Ember.ListItemView.extend
 
 Ember.Widgets.SelectComponent =
 Ember.Component.extend Ember.Widgets.BodyEventListener,
+
+  init: ->
+    @_super()
+    _this = this
+    $(window).scroll ->
+      _this.send 'updateDropSownPosition'
+    $(window).resize ->
+      _this.send 'updateDropSownPosition'
+
   templateName:       'select'
   classNames:         'ember-select'
   attributeBindings: ['tabindex']
@@ -65,6 +74,8 @@ Ember.Component.extend Ember.Widgets.BodyEventListener,
   highlightedIndex: -1
 
   tabindex: -1
+
+  dropDownPosition:''
 
   showDropdown: no
 
@@ -186,9 +197,6 @@ Ember.Component.extend Ember.Widgets.BodyEventListener,
     regex = new RegExp(escapedSearchText, 'i')
     regex.test(label)
 
-  toggleDropdown: (event) ->
-    @toggleProperty 'showDropdown'
-
   hideDropdown: (event) ->
     @set 'showDropdown', no
 
@@ -300,4 +308,21 @@ Ember.Component.extend Ember.Widgets.BodyEventListener,
     else if newIndex >= endIndex
       $listView.scrollTop (newIndex - numRows + 1.5) * @get('rowHeight')
 
+  actions:
+
+    updateDropSownPosition: ->
+      if @get("showDropdown")
+      # unless @get("showDropdown")
+        element     = @$(".ember-select-container")
+        offset      = element.offset()
+        offset.top  = offset.top + element.outerHeight() - $(window).scrollTop()
+        offset.left = offset.left - $(window).scrollLeft()
+        # console.debug 'offset is', offset
+        # #@$('.dropdown-menu').offset(offset)
+        @set 'dropDownPosition', 'top: ' + offset.top + 'px; left: ' + offset.left + 'px; right: auto;'
+
+    toggleDropdown: (event) ->
+      @toggleProperty 'showDropdown'
+      @send 'updateDropSownPosition'
+      
 Ember.Handlebars.helper('select-component', Ember.Widgets.SelectComponent)
